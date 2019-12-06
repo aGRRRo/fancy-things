@@ -1,8 +1,8 @@
 #!/bin/bash
 #Simple Solr Provisioner by Nikolai Khvatov <nikolai_khvatov@epam.com>
 
-CONF_DIR=conf_${ZK_CONF}
-CONF_SET=address_${ZK_CONF}
+CONF_DIR=${ZK_CONF_DIR}
+CONF_SET=${ZK_CONF_NAME}
 
 
 availability_check_zk () {

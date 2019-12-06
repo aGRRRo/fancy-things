@@ -1,6 +1,8 @@
 #!/bin/bash
-#Simple Solr Provisioner by Nikolai Khvatov <n.hvatov@gmail.com>
-# SOLR_HOST_LIST && ZK_HOST_LIST - can be lists.
+#Simple Solr Provisioner by Nikolai Khvatov <nikolai_khvatov@epam.com>
+
+CONF_DIR=conf_${ZK_CONF}
+CONF_SET=address_${ZK_CONF}
 
 
 availability_check_zk () {
@@ -37,8 +39,8 @@ ZOOKEEPER_HOST=$(availability_check_zk)
 config_sets_provisioner () {
 if [[ -n "${ZOOKEEPER_HOST}" ]]; then
   echo "Active Zookeeper host found: ${ZOOKEEPER_HOST} !"
-  echo "Uploading ${ZK_CONF} config sets to Zookeeper!"
-  solr zk upconfig -n "${ZK_CONF}" -d "${ZK_CONF}" -z "${ZOOKEEPER_HOST}":"${ZK_PORT}"
+  echo "Uploading ${CONF_SET} config sets to Zookeeper..."
+  solr zk upconfig -n "${CONF_SET}" -d "${CONF_DIR}" -z "${ZOOKEEPER_HOST}":"${ZK_PORT}"
     RETVAL=$?
     if [[ "${RETVAL}" -eq 0 ]]; then
       echo "Configs successfully uploaded!"
@@ -54,21 +56,28 @@ if [[ -n "${ZOOKEEPER_HOST}" ]]; then
 
 
 collections_provisioner () {
+PORT=${SOLR_PORT}
+SHARDS_NUM=2
+SHARDS_PNODE=2
+REPL_FACTOR=2
 if [[ -n "${SOLR_HOST}" ]] && [[ -n "${ZOOKEEPER_HOST}" ]]; then
   echo "Active Solr host found: ${SOLR_HOST} !"
   echo "Active Zookeeper host found: ${ZOOKEEPER_HOST} !"
-  #export SOLR_HOST
-  echo "Checking presence of the Collection ${ZK_CONF} on Solr(${SOLR_HOST})"
-  solr healthcheck -c "${ZK_CONF}" -z "${ZOOKEEPER_HOST}" &> /dev/null
+  echo "Checking presence of the Collection ${CONF_SET} on Solr(${SOLR_HOST})..."
+  curl "http://${SOLR_HOST}:${PORT}/solr/admin/collections?action=LIST&wt=json" -s | grep -q "${CONF_SET}"
       RETVAL=$?
       if [[ "${RETVAL}" -eq 0 ]]; then
-            echo "Collection ${ZK_CONF} already exists"
+            echo "Collection ${CONF_SET} already exists, you are ready to go!"
+            exit 0
       else
-        echo "It looks like there no address_${ZK_CONF_REG} Collection right now, let me create it for you..."
-        solr create -c "${ZK_CONF}" -n "${ZK_CONF}" -shards 2
+        echo "It looks like there is no ${CONF_SET} Collection right now, let me create it for you..."
+        curl -L -v "http://${SOLR_HOST}:${PORT}/solr/admin/collections?action=CREATE&name=${CONF_SET}&numShards=${SHARDS_NUM}&replicationFactor=${REPL_FACTOR}&maxShardsPerNode=${SHARDS_PNODE}&wt=xml"
+        echo "Adding ${CONF_SET} config sets to ${CONF_SET} Collection..."
+        curl -L -v "http://${SOLR_HOST}:${PORT}/solr/admin/collections?action=MODIFYCOLLECTION&collection=${CONF_SET}&collection.configName=${CONF_SET}"
+        echo "Collection ${CONF_SET} created and config set ${CONF_SET} added, you are ready to go!"
       fi
   else
-    echo "No Zookeeper or/and Solr hosts found, collections healthcheck failed, however the actual value of ZOOKEEPER_HOST VAR was: ${ZOOKEEPER_HOST} !"
+    echo "No Zookeeper or/and Solr hosts found, collections healthcheck failed, however the actual value of ZOOKEEPER_HOST VAR was: ${ZOOKEEPER_HOST} and SOLR_HOST VAR was: ${SOLR_HOST} !"
     exit 1
   fi
 }

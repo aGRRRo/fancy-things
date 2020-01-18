@@ -6,8 +6,8 @@ import argparse
 # If you push a message to queue which is not exists it will be created!
 # If you push a message to exchange which is not exists it will be NOT created!
 print('Warning!')
-print('If you push a message to queue which is not exists it will be created!')
-print('If you push a message to exchange which is not exists it will be NOT created!')
+print('If you push a message to queue which is not exist it will be created!')
+print('If you push a message to exchange which is not exist it will be NOT created!')
 
 message = ''
 param = argparse.ArgumentParser()

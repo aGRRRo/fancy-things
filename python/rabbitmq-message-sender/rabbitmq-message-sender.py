@@ -9,7 +9,6 @@ print('Warning!')
 print('If you push a message to queue which is not exist it will be created!')
 print('If you push a message to exchange which is not exist it will be NOT created!')
 
-message = ''
 param = argparse.ArgumentParser()
 param.add_argument('-i', '--instance', help='RabbitMQ Instance IP or Host')
 param.add_argument('-p', '--port', help='RabbitMQ Port')
@@ -19,6 +18,7 @@ param.add_argument('-v', '--vhost', help='RabbitMQ Vhost')
 param.add_argument('-r', '--routing_key', help='RabbitMQ Vhost')
 param.add_argument('-t', '--type',  help='RabbitMQ destination type Queue or Exchange', default='queue')
 param.add_argument('-o', '--object', help='RabbitMQ Exchange/Queue name name')
+param.add_argument('-m', '--message', help='RabbitMQ Message')
 args = param.parse_args()
 conn = pika.BlockingConnection
 auth = pika.PlainCredentials
@@ -32,6 +32,7 @@ def send_message():
     object_type = args.type
     object = args.object
     credentials = auth(args.user, args.secret)
+    message = args.message
     connection = conn(pika.ConnectionParameters(host, port, vhost, credentials))
     channel = connection.channel()
     if object_type == 'exchange' and object and message:

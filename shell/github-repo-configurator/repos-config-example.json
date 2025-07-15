@@ -1,0 +1,148 @@
+{
+  "repositories": [
+    {
+      "name": "repo1",  // Required: Repository name (must be unique in the org)
+      "default_branch": "develop",  // Optional: Custom default branch name (e.g., "develop"). If omitted or "main", skips switch.
+      "visibility": "private",  // Optional: "private" (default), "public", or "internal"
+      "settings": {  // Optional: General repo settings (defaults: as below)
+        "suggest_update_branch": true,  // Optional: Always suggest updating PR branches (default: true)
+        "auto_delete_head": true,  // Optional: Automatically delete head branches after merge (default: true)
+        "allow_forking": false  // Optional: Allow forking (default: false)
+      },
+      "add_codeowners": true,  // Optional: Whether to add/update CODEOWNERS file (default: true)
+      "codeowners_content": "* @TEST/test-reviewers\n# Optional comment or additional rules",  // Optional: Content for .github/CODEOWNERS file (default: "* @TEST/test-reviewers"; use \n for newlines)
+      "actions": {  // Optional: Repo-level GitHub Actions variables and secrets
+        "variables": {  // Optional: Object of key-value pairs
+          "VAR1": "value1",
+          "VAR2": "value2"
+        },
+        "secrets": {  // Optional: Object of key-value pairs (secrets are encrypted)
+          "SECRET1": "secret_value1",
+          "SECRET2": "secret_value2"
+        }
+      },
+      "dependabot": {  // Optional: Repo-level Dependabot secrets (Dependabot does not support variables)
+        "secrets": {  // Optional: Object of key-value pairs
+          "DEP_SECRET1": "dep_secret_value1",
+          "DEP_SECRET2": "dep_secret_value2"
+        }
+      },
+      "autolinks": [  // Optional: Array of autolink references
+        {
+          "key_prefix": "JIRA-",  // Required: Prefix (e.g., "JIRA-")
+          "url_template": "https://jira.example.com/browse/<num>",  // Required: URL template (<num> is replaced with the reference number)
+          "is_alphanumeric": true  // Optional: Whether the reference is alphanumeric (default: true)
+        },
+        {
+          "key_prefix": "TICKET-",
+          "url_template": "https://tickets.example.com/<num>",
+          "is_alphanumeric": false
+        }
+      ],
+      "collaborators": [  // Optional: Array of individual collaborators
+        {
+          "username": "githubuser1",  // Required: GitHub username
+          "permission": "admin"  // Required: "admin", "maintain", "write", "triage", or "read"
+        },
+        {
+          "username": "githubuser2",
+          "permission": "write"
+        }
+      ],
+      "teams": [  // Optional: Array of org teams
+        {
+          "slug": "team-slug1",  // Required: Team slug (from org)
+          "permission": "maintain"  // Required: "admin", "maintain", "write", "triage", or "read" (Note: "push" is alias for "write", "pull" for "read")
+        },
+        {
+          "slug": "team-slug2",
+          "permission": "read"
+        }
+      ],
+      "branch_protection": [  // Optional: Array of branch protection rules (defaults to protections on "main" and "develop" with spec values if omitted)
+        {
+          "branch": "main",  // Required: Branch name or pattern (e.g., "main", "develop", "feature/*")
+          "required_approvals": 2,  // Optional: Number of required PR approvals (default: 2)
+          "require_code_owner_reviews": true,  // Optional: Require review from code owners (default: true)
+          "dismiss_stale_reviews": true,  // Optional: Dismiss stale approvals on new commits (default: true)
+          "enforce_admins": true  // Optional: Enforce rules for admins (default: true)
+        },
+        {
+          "branch": "develop",
+          "required_approvals": 2,
+          "require_code_owner_reviews": true,
+          "dismiss_stale_reviews": true,
+          "enforce_admins": true
+        }
+      ]
+    },
+    {
+      "name": "repo2",  // Another repo example
+      "visibility": "internal",
+      "settings": {
+        "suggest_update_branch": false,
+        "auto_delete_head": false,
+        "allow_forking": true
+      },
+      "add_codeowners": false,  // Skip adding CODEOWNERS
+      "codeowners_content": "",  // Ignored if add_codeowners is false or content is empty
+      "actions": {
+        "variables": {
+          "VAR3": "value3"
+        },
+        "secrets": {
+          "SECRET3": "secret_value3"
+        }
+      },
+      "dependabot": {
+        "secrets": {
+          "DEP_SECRET3": "dep_secret_value3"
+        }
+      },
+      "autolinks": [],  // Empty array: no autolinks
+      "collaborators": [],  // Empty array: no collaborators
+      "teams": [],  // Empty array: no teams
+      "branch_protection": [  // Custom branches
+        {
+          "branch": "staging",
+          "required_approvals": 1,
+          "require_code_owner_reviews": false,
+          "dismiss_stale_reviews": false,
+          "enforce_admins": false
+        }
+      ]
+    }
+  ],
+  "shared": {  // Optional: Shared configurations applied to specific repos (not automatically to all)
+    "actions": {
+      "variables": [  // Optional: Array of shared variables
+        {
+          "name": "SHARED_VAR1",  // Required: Variable name
+          "value": "shared_value1",  // Required: Value
+          "repos": ["repo1", "repo2"]  // Required: Array of repo names (must match repositories in the list)
+        },
+        {
+          "name": "SHARED_VAR2",
+          "value": "shared_value2",
+          "repos": ["repo1"]
+        }
+      ],
+      "secrets": [  // Optional: Array of shared secrets
+        {
+          "name": "SHARED_SECRET1",
+          "value": "shared_secret_value1",
+          "repos": ["repo1", "repo2"]
+        }
+      ]
+    },
+    "dependabot": {
+      "secrets": [  // Optional: Array of shared Dependabot secrets (no variables supported)
+        {
+          "name": "SHARED_DEP_SECRET1",
+          "value": "shared_dep_value1",
+          "repos": ["repo1", "repo2"]
+        }
+      ]
+    }
+  }
+}

@@ -25,5 +25,5 @@
 
 ## How-to use:
 1. Edit repos-config-example.json
-2. Ensure you have GH_TOKEN env variable set and your token has enough rights
+2. Ensure you have GH_TOKEN env variable set and your token has enough permissions
 3. Run script: ```./github-repo-handler.sh <YOUR_ORG/USERNAME> ./<CONFIGURED_JSON_FILE>```

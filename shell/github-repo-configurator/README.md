@@ -20,10 +20,10 @@
 ## Configuration file in Json format, which supports multiple repositories creation and managment
 
 ## Pre-requisites:
-1)GH CLI v2.75+
-2)JQ 1.6+
+* GH CLI v2.75+
+* JQ 1.6+
 
 ## How-to use:
-1)Edit repos-config-example.json
-2)Ensure you have GH_TOKEN env variable set and your token has enough rights
-3)Run script: ```./github-repo-handler.sh <YOUR_ORG/USERNAME> ./<CONFIGURED_JSON_FILE>```
+1. Edit repos-config-example.json
+2. Ensure you have GH_TOKEN env variable set and your token has enough rights
+3. Run script: ```./github-repo-handler.sh <YOUR_ORG/USERNAME> ./<CONFIGURED_JSON_FILE>```

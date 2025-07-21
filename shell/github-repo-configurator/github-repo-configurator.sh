@@ -134,6 +134,43 @@ add_codeowners() {
   fi
 }
 
+# New Function to add LICENSE file (MIT template) if not exists (in root on 'main') - Modeled after add_codeowners
+add_license() {
+  local repo="$1"
+  local content="${2:-MIT License\n\nCopyright (c) $(date +%Y) $ORG\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.}"  # Default MIT content with current year and org
+
+  if [ -z "$content" ]; then
+    echo "Warning: No content provided for LICENSE in $ORG/$repo. Skipping."
+    return 0
+  fi
+
+  local branch="main"
+
+  # Check if file exists on main
+  if gh api "/repos/$ORG/$repo/contents/LICENSE?ref=$branch" >/dev/null 2>&1; then
+    echo "LICENSE already exists on '$branch' in $ORG/$repo. Skipping addition."
+    return 0
+  else
+    echo "LICENSE does not exist on '$branch' in $ORG/$repo. Proceeding to add."
+  fi
+
+  echo "Adding/Updating LICENSE to root of $ORG/$repo on '$branch'..."
+  local encoded_content=$(echo -e "$content" | base64)
+  gh api --method PUT -H "Accept: application/vnd.github.v3+json" "/repos/$ORG/$repo/contents/LICENSE" \
+    -f "message=Add or update LICENSE file (MIT)" \
+    -f "content=$encoded_content" \
+    -f "branch=$branch" || { echo "Error: Failed to add/update LICENSE to $repo on '$branch'"; return 1; }
+
+  # Verify addition
+  sleep 1  # Brief delay for API consistency
+  if gh api "/repos/$ORG/$repo/contents/LICENSE?ref=$branch" >/dev/null 2>&1; then
+    echo "LICENSE successfully added/updated and verified on '$branch'."
+  else
+    echo "Error: LICENSE addition failed verification on '$branch' in $ORG/$repo."
+    return 1
+  fi
+}
+
 # Function to create a branch if it doesn't exist (updated with base parameter)
 create_branch_if_not_exists() {
   local repo="$1"
@@ -389,6 +426,8 @@ process_repositories() {
     local allow_forking=$(echo "$JSON_DATA" | jq -r ".repositories[$i].settings.allow_forking // false")
     local add_codeowners=$(echo "$JSON_DATA" | jq -r ".repositories[$i].add_codeowners // true")
     local codeowners_content=$(echo "$JSON_DATA" | jq -r ".repositories[$i].codeowners_content // \"* @TEST/test-reviewers\"")
+    local add_license=$(echo "$JSON_DATA" | jq -r ".repositories[$i].add_license // true")
+    local license_content=$(echo "$JSON_DATA" | jq -r ".repositories[$i].license_content // empty")
     local actions_vars=$(echo "$JSON_DATA" | jq -c ".repositories[$i].actions.variables // {}")
     local actions_secrets=$(echo "$JSON_DATA" | jq -c ".repositories[$i].actions.secrets // {}")
     local dependabot_secrets=$(echo "$JSON_DATA" | jq -c ".repositories[$i].dependabot.secrets // {}")
@@ -419,6 +458,11 @@ process_repositories() {
     # Add CODEOWNERS on main (before any default switch)
     if [ "$add_codeowners" = "true" ]; then
       add_codeowners "$repo_name" "$codeowners_content" || continue
+    fi
+
+    # Add LICENSE on main (after CODEOWNERS, before branching)
+    if [ "$add_license" = "true" ]; then
+      add_license "$repo_name" "$license_content" || continue
     fi
 
     # Set custom default branch if specified

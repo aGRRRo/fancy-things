@@ -1,9 +1,14 @@
 # This script provides example of GitHub repositories creation and configuration management.
+
+## Disclaimer: Proof of Concept/Proof of Work
+## This script is provided as a Proof of Concept (POC)/(POW) and should be used at your own risk. It is intentionally designed with safety as a ##priority, limiting operations to adding/creating or updating configurations only—no deletions or destructive actions are performed. However, always ##review the script's behavior, test in a non-production environment, and verify changes to avoid unintended impacts on your repositories.
+
 ## Supported features
 * General Settings -> Always suggest updating pull request branches configuration
 * General Settings -> Automatically delete head branches configuration
 * Allow forking configuration
-* "CODEOWNERS" configuration(via file creation and it's content management)
+* "CODEOWNERS" file with content configuration(via file creation and it's content management)
+* "LICENSE" file with content configuration(via file creation and it's content management)
 * Repository visibility level configuration
 * Per-repository level variables and secrets for each repository for actions configuration
 * Per-repository level secrets for each repository for dependabot configuration
@@ -16,7 +21,7 @@
     - Enabled Require a pull request before merging(Require approvals =2 approvers)
     - Enabled Require review from Code Owners
     - Enabled Dismiss stale pull request approvals when new commits are pushed
- 
+
 ## Configuration file in Json format, which supports multiple repositories creation and managment
 
 ## Pre-requisites:

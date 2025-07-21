@@ -1,7 +1,7 @@
 # This script provides example of GitHub repositories creation and configuration management.
 
 ## Disclaimer: Proof of Concept/Proof of Work
-This script is provided "as is" and as a Proof of Concept (POC)/(POW) and should be used at your own risk. It is intentionally designed with safety as a priority, limiting operations to adding/creating or updating configurations only—no deletions or destructive actions are performed. However, always review the script's behavior, test in a non-production environment, and verify changes to avoid unintended impacts on your repositories.
+This script is provided "as-is" and as a Proof of Concept (POC)/(POW) and should be used at your own risk. It is intentionally designed with safety as a priority, limiting operations to adding/creating or updating configurations only—no deletions or destructive actions are performed. However, always review the script's behavior, test in a non-production environment, and verify changes to avoid unintended impacts on your repositories.
 
 ## Supported features
 * General Settings -> Always suggest updating pull request branches configuration
